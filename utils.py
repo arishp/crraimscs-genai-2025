@@ -70,11 +70,13 @@ class AgentState(TypedDict):
 
 
 # #################################################################################
-# # Nodes and Edges
-# # We can lay out an agentic RAG graph like this:
-# # The state is a set of messages
-# # Each node will update (append to) state
-# # Conditional edges decide which node to visit next
+# Nodes and Edges
+# We can lay out an agentic RAG graph like this:
+# The state is a set of messages
+# Each node will update (append to) state
+# Conditional edges decide which node to visit next
+
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 def agent(state):
     """
@@ -89,7 +91,7 @@ def agent(state):
     """
     print("---CALL AGENT---")
     messages = state["messages"]
-    model = ChatGoogleGenerativeAI(temperature=0, model="gemini-2.0-flash-exp", streaming=True)
+    model = ChatGoogleGenerativeAI(temperature=0.5, model="gemini-2.0-flash-exp", streaming=True)
     model_with_tools = model.bind_tools(tools)
     response = model_with_tools.invoke(messages)
     # We return a list, because this will get added to the existing list
@@ -97,7 +99,6 @@ def agent(state):
 
 from typing import Literal
 from langchain_core.prompts import PromptTemplate
-from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel, Field
 
 def grade_documents(state) -> Literal["generate", "rewrite"]:
@@ -116,7 +117,7 @@ def grade_documents(state) -> Literal["generate", "rewrite"]:
         """Binary score for relevance check."""
         binary_score: str = Field(description="Relevance score 'yes' or 'no'")
     # LLM
-    model = ChatGoogleGenerativeAI(temperature=0, model="gemini-2.0-flash-exp", streaming=True)
+    model = ChatGoogleGenerativeAI(temperature=0.5, model="gemini-2.0-flash-exp", streaming=True)
     # LLM with structured output for validation
     structured_llm = model.with_structured_output(grade)
     # Prompt
@@ -165,7 +166,7 @@ def generate(state):
     # Prompt
     prompt = hub.pull("rlm/rag-prompt")
     # LLM
-    llm = ChatGoogleGenerativeAI(temperature=0, model="gemini-2.0-flash-exp", streaming=True)
+    llm = ChatGoogleGenerativeAI(temperature=0.5, model="gemini-2.0-flash-exp", streaming=True)
     # # Post-processing
     # def format_docs(docs):
     #     return "\n\n".join(doc.page_content for doc in docs)
@@ -198,14 +199,20 @@ def rewrite(state):
     \n ------- \n
     {question} 
     \n ------- \n
-    Formulate an improved question: """,
+    Formulate only one improved question: """,
         )
     ]
     # Grader
-    model = ChatGoogleGenerativeAI(temperature=0, model="gemini-2.0-flash-exp", streaming=True)
+    model = ChatGoogleGenerativeAI(temperature=0.5, model="gemini-2.0-flash-exp", streaming=True)
     response = model.invoke(msg)
     return {"messages": [response]}
 
+
+# Graph
+# Start with an agent, call_model
+# Agent make a decision to call a function
+# If so, then action to call tool (retriever)
+# Then call agent with the tool output added to messages (state)
 
 from langgraph.graph import END, StateGraph, START
 from langgraph.prebuilt import ToolNode
@@ -257,9 +264,9 @@ inputs = {
     ]
 }
 
-for output in graph.stream(inputs):
-    for key, value in output.items():
-        pprint.pprint(f"Output from node '{key}':")
-        pprint.pprint("---")
-        pprint.pprint(value, indent=2, width=80, depth=None)
-    pprint.pprint("\n---\n")
+# for output in graph.stream(inputs):
+#     for key, value in output.items():
+#         pprint.pprint(f"Output from node '{key}':")
+#         pprint.pprint("---")
+#         pprint.pprint(value, indent=2, width=80, depth=None)
+#     pprint.pprint("\n---\n")
