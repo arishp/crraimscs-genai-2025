@@ -7,3 +7,6 @@ langgraph
 langchain-text-splitters
 beautifulsoup4
 streamlit
+langchain-huggingface
+arxiv
+wikipedia
