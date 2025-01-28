@@ -10,3 +10,6 @@ streamlit
 langchain-huggingface
 arxiv
 wikipedia
+duckduckgo-search
+boto3
+awscli
