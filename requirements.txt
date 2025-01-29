@@ -1,16 +1,15 @@
 langchain-community
-langchain-google-genai
-tiktoken
+arxiv
+wikipedia
+boto3
+langchain-aws
+awscli
 chromadb
 langchain
 langgraph
-langchain-text-splitters
 beautifulsoup4
-streamlit
-langchain-huggingface
-arxiv
-wikipedia
 tavily-python
-boto3
-awscli
-langchain-aws
+ipykernel
+
+# langchain-text-splitters
+

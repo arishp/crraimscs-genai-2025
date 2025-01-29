@@ -3,4 +3,4 @@ __pycache__/
 .env
 .vscode
 .DS_Store
-chroma_vdb/
+vdb/
